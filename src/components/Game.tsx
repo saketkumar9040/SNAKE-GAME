@@ -21,15 +21,15 @@ const Game = (): JSX.Element => {
     const { translationX, translationY } = event.nativeEvent;
     if (Math.abs(translationX) > Math.abs(translationY)) {
       if (translationX > 0) {
-        // moving right
+        setDirection(Direction.Right)
       } else {
-        //moving left
+        setDirection(Direction.Left)
       }
     } else {
       if (translationY > 0) {
-        // moving down
+        setDirection(Direction.Down)
       } else {
-        //moving up
+        setDirection(Direction.Up)
       }
     }
   };
