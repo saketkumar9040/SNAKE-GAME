@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Coordinate } from '../types/types'
+import { Coordinate } from '../types/types';
 import { Colors } from '../globals/colors';
 
 interface SnakeProps {
@@ -17,7 +17,6 @@ const Snake = ({snake}):JSX.Element => {
                 top: segment.y * 10,
             }
             return <View key={index} style={[styles.snake,segmentStyle]}>
-
             </View>
         })
     }
@@ -29,8 +28,8 @@ export default Snake
 
 const styles = StyleSheet.create({
     snake :{
-        width:15,
-        height:15,
+        width:18,
+        height:18,
         backgroundColor:Colors.primary,
         borderRadius:80,
         position:"absolute",
