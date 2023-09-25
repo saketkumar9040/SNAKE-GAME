@@ -1,4 +1,12 @@
-import { Alert, SafeAreaView, StyleSheet, Dimensions, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Dimensions,
+  View,
+  Platform,
+  Text,
+} from "react-native";
 import React, { JSX, useEffect, useState } from "react";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { Colors } from "../globals/colors";
@@ -6,7 +14,9 @@ import { Coordinate, Direction, GestureEventType } from "../types/types";
 import Snake from "./Snake";
 import { checkGameOver } from "../utils/checkGameOver";
 import Food from "./Food";
-import { checkEatsFood } from '../utils/checkEatsFood';
+import { checkEatsFood } from "../utils/checkEatsFood";
+import { randomFoodPosition } from "../utils/randomFoodPosition";
+import Header from "./Header";
 
 const SNAKE_INITIAL_POSITION = [{ x: 5, y: 5 }];
 const FOOD_INITIAL_POSITION = { x: 5, y: 20 };
@@ -20,19 +30,20 @@ const SCORE_INCREMENT = 10;
 const Game = (): JSX.Element => {
   const [direction, setDirection] = useState<Direction>(Direction.Right);
   const [snake, setSnake] = useState<Coordinate[]>(SNAKE_INITIAL_POSITION);
-  const [food,setFood] = useState<Coordinate>(FOOD_INITIAL_POSITION);
+  const [food, setFood] = useState<Coordinate>(FOOD_INITIAL_POSITION);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isGamePaused, setIsGamePaused] = useState<boolean>(false);
-  const [score,setScore] = useState<number>(0);
+  const [score, setScore] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
-  useEffect(()=>{
-    if(!isGameOver){
-        const intervalID = setInterval(()=>{
+  useEffect(() => {
+    if (!isGameOver) {
+      const intervalID = setInterval(() => {
         !isGamePaused && moveSnake();
-        },MOVE_INTERVAL);
-        return()=>clearInterval(intervalID)
+      }, MOVE_INTERVAL);
+      return () => clearInterval(intervalID);
     }
-  },[snake,isGameOver,isGamePaused]);
+  }, [snake, isGameOver, isGamePaused]);
 
   const handleGesture = (event: GestureEventType) => {
     const { translationX, translationY } = event.nativeEvent;
@@ -57,10 +68,10 @@ const Game = (): JSX.Element => {
 
     // GAME OVER =================================================================================>
 
-    if(checkGameOver(snakeHead,GAME_BOUNDS)){
-        setIsGameOver((prev)=>!prev);
-        Alert.alert("GAME OVER 😭");
-        return;
+    if (checkGameOver(snakeHead, GAME_BOUNDS)) {
+      setIsGameOver((prev) => !prev);
+      Alert.alert("GAME OVER 😭");
+      return;
     }
 
     switch (direction) {
@@ -80,23 +91,37 @@ const Game = (): JSX.Element => {
         break;
     }
 
-    // IF SNAKE EATS FOOD ================================================================>
-     if(checkEatsFood(newHead,food,2)){
-        setSnake([newHead,...snake]);
-       //  SET NEW POSITION OF FOOD ======================================================>
-          setScore(score + SCORE_INCREMENT)
-      
-     }
-
-    setSnake([newHead,...snake.slice(0,-1)]);
+    if (checkEatsFood(newHead, food, 2)) {
+      setFood(randomFoodPosition(GAME_BOUNDS.xMax, GAME_BOUNDS.yMax));
+      setSnake([newHead, ...snake]);
+      setScore(score + SCORE_INCREMENT);
+    } else {
+      setSnake([newHead, ...snake.slice(0, -1)]);
+    }
   };
+
+  const pauseGame = () => {
+    setIsGamePaused(!isPaused)
+  }
+
+  const reloadGame = () => {
+    setScore(0);
+    setSnake(SNAKE_INITIAL_POSITION);
+    setIsGameOver(false);
+    setFood(FOOD_INITIAL_POSITION);
+    setDirection(Direction.Right);
+    setIsPaused(false);
+  }
 
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <SafeAreaView style={styles.container}>
+        <Header isPaused={isPaused} pauseGame={pauseGame} reloadGame={reloadGame}>
+            <Text style={{fontSize:20,color:Colors.primary}}>{score}</Text>
+            </Header>
         <View style={styles.boundries}>
           <Snake snake={snake} />
-          <Food x={food.x} y={food.y}/>
+          <Food x={food.x} y={food.y} />
         </View>
       </SafeAreaView>
     </PanGestureHandler>
@@ -109,6 +134,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.primary,
     flex: 1,
+    paddingTop:Platform.OS==="android"?40:0
   },
   boundries: {
     flex: 1,
