@@ -18,10 +18,10 @@ const Header = ({
 }: HeaderProps): JSX.Element => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={reloadGame}>
         <Ionicons name="reload-circle" size={35} color={Colors.primary} />
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={pauseGame}>
         <FontAwesome
           name={isPaused ? "play-circle" : "pause-circle"}
           size={35}

@@ -20,7 +20,7 @@ import Header from "./Header";
 
 const SNAKE_INITIAL_POSITION = [{ x: 5, y: 5 }];
 const FOOD_INITIAL_POSITION = { x: 5, y: 20 };
-const GAME_BOUNDS = { xMin: 0, xMax: 35, yMin: 3, yMax: 83 };
+const GAME_BOUNDS = { xMin: 0, xMax: 35, yMin: 0, yMax: 71 };
 const MOVE_INTERVAL = 50;
 const SCORE_INCREMENT = 10;
 
@@ -39,7 +39,7 @@ const Game = (): JSX.Element => {
   useEffect(() => {
     if (!isGameOver) {
       const intervalID = setInterval(() => {
-        !isGamePaused && moveSnake();
+        !isPaused && moveSnake();
       }, MOVE_INTERVAL);
       return () => clearInterval(intervalID);
     }
@@ -101,8 +101,8 @@ const Game = (): JSX.Element => {
   };
 
   const pauseGame = () => {
-    setIsGamePaused(!isPaused)
-  }
+    setIsPaused(!isPaused);
+  };
 
   const reloadGame = () => {
     setScore(0);
@@ -111,14 +111,18 @@ const Game = (): JSX.Element => {
     setFood(FOOD_INITIAL_POSITION);
     setDirection(Direction.Right);
     setIsPaused(false);
-  }
+  };
 
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <SafeAreaView style={styles.container}>
-        <Header isPaused={isPaused} pauseGame={pauseGame} reloadGame={reloadGame}>
-            <Text style={{fontSize:20,color:Colors.primary}}>{score}</Text>
-            </Header>
+        <Header
+          isPaused={isPaused}
+          pauseGame={pauseGame}
+          reloadGame={reloadGame}
+        >
+          <Text style={{ fontSize: 20, color: Colors.primary }}>{score}</Text>
+        </Header>
         <View style={styles.boundries}>
           <Snake snake={snake} />
           <Food x={food.x} y={food.y} />
@@ -134,7 +138,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.primary,
     flex: 1,
-    paddingTop:Platform.OS==="android"?40:0
+    paddingTop: Platform.OS === "android" ? 40 : 0,
   },
   boundries: {
     flex: 1,
