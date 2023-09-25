@@ -43,7 +43,7 @@ const Game = (): JSX.Element => {
       }, MOVE_INTERVAL);
       return () => clearInterval(intervalID);
     }
-  }, [snake, isGameOver, isGamePaused]);
+  }, [snake, isGameOver, isPaused]);
 
   const handleGesture = (event: GestureEventType) => {
     const { translationX, translationY } = event.nativeEvent;
