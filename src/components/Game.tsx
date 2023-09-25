@@ -1,21 +1,27 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, Dimensions, View } from "react-native";
 import React, { JSX, useEffect, useState } from "react";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { Colors } from "../globals/colors";
 import { Coordinate, Direction, GestureEventType } from "../types/types";
 import Snake from "./Snake";
+import { checkGameOver } from "../utils/checkGameOver";
 
 const SNAKE_INITIAL_POSITION = [{ x: 5, y: 5 }];
 const FOOD_INITIAL_POSITION = { x: 5, y: 20 };
-const GAME_BOUNDS = { xMin: 0, xMax: 35, yMin: 0, yMax: 63 };
+const GAME_BOUNDS = { xMin: 0, xMax: 35, yMin: 3, yMax: 83 };
 const MOVE_INTERVAL = 50;
 const SCORE_INCREMENT = 10;
+
+// const {width,height }= Dimensions.get("screen");
+// console.log(width,height)
 
 const Game = (): JSX.Element => {
   const [direction, setDirection] = useState<Direction>(Direction.Right);
   const [snake, setSnake] = useState<Coordinate[]>(SNAKE_INITIAL_POSITION);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isGamePaused, setIsGamePaused] = useState<boolean>(false);
+
+ 
 
   useEffect(()=>{
     if(!isGameOver){
@@ -49,6 +55,12 @@ const Game = (): JSX.Element => {
 
     // GAME OVER =================================================================================>
 
+    if(checkGameOver(snakeHead,GAME_BOUNDS)){
+        setIsGameOver((prev)=>!prev);
+        Alert.alert("GAME OVER 😭");
+        return;
+    }
+
     switch (direction) {
       case Direction.Up:
         newHead.y -= 1;
@@ -65,7 +77,11 @@ const Game = (): JSX.Element => {
       default:
         break;
     }
-    setSnake([newHead,...snake])
+
+    // IF SNAKE EATS FOOD ================================================================>
+
+
+    setSnake([newHead,...snake.slice(0,-1)]);
   };
 
   return (
